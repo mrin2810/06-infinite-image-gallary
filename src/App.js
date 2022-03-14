@@ -1,14 +1,18 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import './App.css';
 
 const accessKey = process.env.REACT_APP_UNSPLASH_ACCESS_KEY;
 
 export default function App() {
+  const [images, setImages] = useState([]);
 
   useEffect(() => {
     fetch(`https://api.unsplash.com/photos?client_id=${accessKey}`)
     .then(response => response.json())
-    .then(data => console.log(data));
+    .then(data => {
+      console.log(data);
+      setImages(data);
+    });
   }, [])
 
   // RETURN ERROR FOR MISSING ACCESSS KEY
@@ -32,9 +36,9 @@ export default function App() {
       </form>
 
       <div className="image-grid">
-        {[...Array(100)].map((_, index) => (
+        {images.map((image, index) => (
           <div className="image" key={index}>
-            <img src="https://placekitten.com/g/1920/1080" alt="Sample" />
+            <img src={image.urls.regular} alt={image.alt_description} />
           </div>
         ))}
       </div>
