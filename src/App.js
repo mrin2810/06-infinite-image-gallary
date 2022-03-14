@@ -10,6 +10,18 @@ export default function App() {
     .then(response => response.json())
     .then(data => console.log(data));
   }, [])
+
+  // RETURN ERROR FOR MISSING ACCESSS KEY
+  if(!accessKey) {
+    return (
+      <a 
+        href='https://unsplash.com/developers' 
+        className='error'
+      >
+        Get Your Unsplash API
+      </a>
+    )
+  }
   return (
     <div className="app">
       <h1>Unsplash Image Gallery!</h1>
