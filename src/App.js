@@ -6,19 +6,15 @@ const accessKey = process.env.REACT_APP_UNSPLASH_ACCESS_KEY;
 
 export default function App() {
   const [images, setImages] = useState([]);
-  const [page, setPage] = useState([]);
-
+  const [page, setPage] = useState(1);
+    
   useEffect(() => {
-    getPhotos();
-  }, []);
-
-  function getPhotos() {
-    fetch(`https://api.unsplash.com/photos?client_id=${accessKey}`)
+    fetch(`https://api.unsplash.com/photos?client_id=${accessKey}&page=${page}`)
     .then(response => response.json())
     .then(data => {
       setImages(images => [...images, ...data]);
     });
-  }
+  }, [page]);
 
   // RETURN ERROR FOR MISSING ACCESSS KEY
   if(!accessKey) {
@@ -41,7 +37,7 @@ export default function App() {
       </form>
       <InfiniteScroll
         dataLength={images.length} //This is important field to render the next data
-        next={getPhotos}
+        next={() => setPage(page => page + 1)}
         hasMore={true}
         loader={<h4>Loading...</h4>}
         endMessage={
