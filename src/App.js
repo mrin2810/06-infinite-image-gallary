@@ -1,7 +1,15 @@
 import React from 'react';
 import './App.css';
 
+const accessKey = process.env.REACT_APP_UNSPLASH_ACCESS_KEY;
+
 export default function App() {
+
+  useEffect(() => {
+    fetch(`https://api.unsplash.com/photos?client_id=${accessKey}`)
+    .then(response => response.json())
+    .then(data => console.log(data));
+  }, [])
   return (
     <div className="app">
       <h1>Unsplash Image Gallery!</h1>
