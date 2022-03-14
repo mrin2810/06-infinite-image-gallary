@@ -1,5 +1,4 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import './App.css';
 
@@ -10,22 +9,7 @@ export default function App() {
   const [page, setPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
 
-  useEffect(() => {
-    getPhotos();
-  }, [page]);
-
-  // RETURN ERROR FOR MISSING ACCESSS KEY
-  if(!accessKey) {
-    return (
-      <a 
-        href='https://unsplash.com/developers' 
-        className='error'
-      >
-        Get Your Unsplash API
-      </a>
-    )
-  }
-  function getPhotos() {
+  const getPhotos = useCallback(() => {
     let apiUrl = 'https://api.unsplash.com/photos?';
 
     if(searchTerm) apiUrl = `https://api.unsplash.com/search/photos?query=${searchTerm}`
@@ -38,9 +22,25 @@ export default function App() {
     .then(data => {
       const imagesFromApi = data.results ?? data;
       if (page === 1) setImages(imagesFromApi);
-      
+
       setImages(images => [...images, ...imagesFromApi]);
     });
+  }, [page, searchTerm]);
+
+  useEffect(() => {
+    getPhotos();
+  }, [page, getPhotos]);
+
+  // RETURN ERROR FOR MISSING ACCESSS KEY
+  if(!accessKey) {
+    return (
+      <a 
+        href='https://unsplash.com/developers' 
+        className='error'
+      >
+        Get Your Unsplash API
+      </a>
+    )
   }
 
   function searchPhotos(e) {
