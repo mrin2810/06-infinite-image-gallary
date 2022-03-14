@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import './App.css';
@@ -7,13 +8,10 @@ const accessKey = process.env.REACT_APP_UNSPLASH_ACCESS_KEY;
 export default function App() {
   const [images, setImages] = useState([]);
   const [page, setPage] = useState(1);
-    
+  const [searchTerm, setSearchTerm] = useState('');
+
   useEffect(() => {
-    fetch(`https://api.unsplash.com/photos?client_id=${accessKey}&page=${page}`)
-    .then(response => response.json())
-    .then(data => {
-      setImages(images => [...images, ...data]);
-    });
+    getPhotos();
   }, [page]);
 
   // RETURN ERROR FOR MISSING ACCESSS KEY
@@ -27,14 +25,44 @@ export default function App() {
       </a>
     )
   }
+  function getPhotos() {
+    let apiUrl = 'https://api.unsplash.com/photos?';
+
+    if(searchTerm) apiUrl = `https://api.unsplash.com/search/photos?query=${searchTerm}`
+    
+    apiUrl += `&page=${page}`
+    apiUrl += `&client_id=${accessKey}`;
+    
+    fetch(apiUrl)
+    .then(response => response.json())
+    .then(data => {
+      const imagesFromApi = data.results ?? data;
+      if (page === 1) setImages(imagesFromApi);
+      
+      setImages(images => [...images, ...imagesFromApi]);
+    });
+  }
+
+  function searchPhotos(e) {
+    e.preventDefault();
+    setPage(1);
+    getPhotos();
+  }
+
   return (
     <div className="app">
       <h1>Unsplash Image Gallery!</h1>
 
-      <form>
-        <input type="text" placeholder="Search Unsplash..." />
+      <form onSubmit={(e) => searchPhotos(e)}>
+        <input 
+          type="text" 
+          placeholder="Search Unsplash..." 
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}  
+        />
         <button>Search</button>
       </form>
+
       <InfiniteScroll
         dataLength={images.length} //This is important field to render the next data
         next={() => setPage(page => page + 1)}
